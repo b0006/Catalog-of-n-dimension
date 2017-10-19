@@ -4,9 +4,15 @@
   <ul>
     <li><a href="#target">Задача</a></li>
     <li><a href="#database">Создание базы данных</a></li>
-    <li><a href="#connect">Задача</a></li>
+    <li><a href="#connect">Функция connect()</a></li>
     <li><a href="#disconnect">Функция disconnect()</a></li>
-    <li><a href="#target">Задача</a></li>
+    <li><a href="#select">Функция select()</a></li>
+    <li><a href="#insert">Функция insert()</a></li>
+    <li><a href="#delete">Функция delete</a></li>
+    <li><a href="#update">Функция update</a></li>
+    <li><a href="#example">Пример работы с классом</a></li>
+    <li><a href="#example">Пример работы с классом</a></li>
+    <li><a href="#example">Пример работы с классом</a></li>
   </ul>
   
 <h2 id="target">Задача</h2>
@@ -468,6 +474,7 @@ print_r($res);
 <p>
   На выходы, вы должны получить, примерно, следующее:
 </p>
+
 <pre>
 Array {
     [0] => Array
@@ -489,9 +496,66 @@ Array {
       [PID] => 1
     }
 }
-
 </pre>
 
+<h2 id="">Функиция формирования каталога</h2>
+
 <p align="jusify">
+  Так как каталог произвольной вложенности, значит нам понадобится воспользоваться рекурсией.
 </p>
+
+```php
+//создаем подключение к БД
+$db = new Database();
+$db->connect();
+
+//выборка таблицы "section"
+$db->select('section', '*', null, 'Title');
+$res_sec = $db->getResult();
+
+//выборка таблицы "element"
+$db->select('element');
+$res_elem = $db->getResult();
+
+// рекурсивная функция, которая сформирует дерево категорий
+function create_tree ($sec, $elem, $parent_id){
+
+    $tree = '<ul>';
+
+    for($i =0; $i < count($sec); $i++) {
+        if($sec[$i]["PID"] == $parent_id) {
+            $tree .= "<li>".$sec[$i]['Title'];
+            $tree .=  create_tree ($sec, $elem, $sec[$i]['ID']);
+
+            for($k = 0; $k < count($elem); $k++){
+                if($elem[$k]["ID_section"] == $sec[$i]["ID"]) {
+                    $tree .= "<ul>".$elem[$k]["Title_element"]."</ul>";
+                }
+            }
+            $tree .= '</li>';
+        }
+        else {
+            echo "  ";
+        }
+    }
+    $tree .= '</ul>';               
+
+    return $tree;        
+}
+
+// вызываем функцию и строим дерево
+print_r (create_tree ($res_sec, $res_elem, -1)); 
+```
+
+<p align="jusify">
+  Остальные функции удаления, добавления и обновления данных в БД аналогичны, поэтому примеры их вызовов показывать не буду. В исходном коде можете посмотреть.
+</p>
+
+<h2 id="exp">Приобретенный мною опыт</h2>
+<ul>
+  <li>Опыт работы с HTML, CSS и немного JavaScript (использовался AJAX для динамического обновление каталога);</li>
+  <li>Закрепио основы ООП на языке PHP;</li>
+  <li>Опыт работы с БД, в частности MySQL;</li>
+  <li>Понял, что такое phpmyadmin и с чем его едят.</li>
+</ul>
 
